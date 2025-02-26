@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .container { width: 50%; margin: auto; }
+        .post { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+        .post-title { font-weight: bold; }
+        .post-content { margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>게시판</h1>
+        <div>
+            <input type="text" id="title" placeholder="제목"><br>
+            <textarea id="content" placeholder="내용"></textarea><br>
+            <button onclick="createPost()">글 작성</button>
+        </div>
+        <div id="posts"></div>
+    </div>
+    
+    <script>
+        async function fetchPosts() {
+            const res = await fetch('/posts');
+            const posts = await res.json();
+            const postContainer = document.getElementById('posts');
+            postContainer.innerHTML = '';
+            posts.forEach(post => {
+                const div = document.createElement('div');
+                div.classList.add('post');
+                div.innerHTML = `
+                    <div class="post-title">${post.title}</div>
+                    <div class="post-content">${post.content}</div>
+                    <button onclick="deletePost(${post.id})">삭제</button>
+                `;
+                postContainer.appendChild(div);
+            });
+        }
+
+        async function createPost() {
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            await fetch('/posts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content })
+            });
+            fetchPosts();
+        }
+
+        async function deletePost(id) {
+            await fetch(`/posts/${id}`, { method: 'DELETE' });
+            fetchPosts();
+        }
+
+        fetchPosts();
+    </script>
+</body>
+</html>
