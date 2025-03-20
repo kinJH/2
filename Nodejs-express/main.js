@@ -79,21 +79,6 @@ app.post('/create_process', function(request, response){//생성진행
   })
 
 
-  // var body = '';
-  // request.on('data', function(data){
-  //     body = body + data;
-  // });
-  // request.on('end', function(){
-  //     var post = qs.parse(body);
-  //     var title = post.title;
-  //     var description = post.description;
-  //     fs.writeFile(`data/${title}`, description, 'utf8', function(err){
-  //       response.writeHead(302, {Location: `/?id=${title}`});
-  //       response.end();
-  //     })
-  // });
-})
-
 app.get('/update/:pageId', (request, response) =>{//수정페이지
   fs.readdir('./data', function(error, filelist){
     var filteredId = path.parse(request.params.pageId).base;
