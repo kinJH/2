@@ -87,40 +87,26 @@ router.post('/update_process', (request, response) => {//수정 진행
     if (err) {
       return response.status(500).send('error');
     }
-
-
-
+    var postjson = JSON.parse(content);
+    
     if (loginUser !== postjson.author) {
       return response.send(`
         <script>
-          alert("작성자만 수정할 수 있습니다.");
+          alert("작성자 불일치");
           location.href = "/";
         </script>
       `);
     }
-
     postjson.title = newTitle;
     postjson.description = post.description;
 
-    var save = () => {
+    console.log(postjson)
+    fs.rename(oldFilename, newFilename, function(err){
       fs.writeFile(newFilename, JSON.stringify(postjson), 'utf8', err => {
-        if (err) {
-          return response.status(500).send('수정 저장 실패');
-        }
-        response.redirect(`/topic/${newTitle}`);
-      });
-    };
-
-    if (oldFilename !== newFilename) {
-      fs.rename(oldFilename, newFilename, err => {
-        if (err) {
-          return response.status(500).send('파일 이름 변경 실패');
-        }
-        save();
-      });
-    } else {
-      save();
-    }
+        if (err) return response.status(500).send('파일 저장 실패');
+        response.redirect(`/topic/${newTitle}.json`);
+      })
+    })
   });
 });
 router.post('/delete_process', function(request, response){ //삭제 진행
