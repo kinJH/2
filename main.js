@@ -11,6 +11,7 @@ var indexRouter = require('./routes/index.js');
 var loginRouter = require('./routes/login.js');
 var signupRouter = require('./routes/signup.js')
 var logoutRouter = require('./routes/logout.js');
+var commentRouter = require('./routes/comment.js');
 
 
 app.use((req, res, next)=>{
@@ -41,7 +42,7 @@ app.use(compression())
 
 
 app.get('*',function(request, response, next){
-  fs.readdir('./data', function(error, filelist){
+  fs.readdir('./data/post', function(error, filelist){
     request.list = filelist;
     next();
   })
@@ -54,7 +55,7 @@ app.use('/topic',topicRouter);
 app.use('/login', loginRouter);
 app.use('/signup', signupRouter);
 app.use('/logout', logoutRouter);
-
+app.use('/comment', commentRouter);
 
 app.use((err, req, res, next)=>{
   console.error(err.stack)

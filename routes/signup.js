@@ -27,7 +27,7 @@ router.get('/', (req, res)=>{
     <p><input type='password' name='password_check' placeholder='비밀번호 확인'></p>
     <input type='submit' value='제출'>
     </form>`
-    var html = template.HTML(title, list, description, '')
+    var html = template.HTML(title, list, description, '','')
     res.send(html)
 })
 

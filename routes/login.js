@@ -27,7 +27,8 @@ router.get('/', (req, res)=>{//로그인 페이지
   <p><input type='password' name='password' placeholder='password'></p>
   <input type='submit' value='로그인'>
   </form>`;
-  var html = template.HTML(title, list, description,'', res.locals.authStatus)
+  var html = template.HTML(title, list, description,`
+  <a href='/signup'>가입</a>`, res.locals.authStatus)
   res.send(html) 
 })
 
@@ -43,7 +44,7 @@ router.post('/login_process', (req, res)=>{ //로그인진행
         if(id ===result[0].id && password === result[0].password){
             res.writeHead(302,{location:`/`, 'set-cookie':
                 [`name=${encodeURIComponent(result[0].name)}; Path=/`,
-                'is_login=logined; Path=/'
+                'is_logined=logined; Path=/'
                 ]
             })
             res.end()

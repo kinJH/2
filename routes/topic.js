@@ -119,7 +119,7 @@ router.post('/delete_process', function(request, response){ //삭제 진행
 
 router.get('/:pageId', function(request, response, next){//상세페이지
   var filteredId = path.parse(request.params.pageId).base ;
-  fs.readFile(`data/${filteredId}`, 'utf8', function(err, content){
+  fs.readFile(`data/post/${filteredId}`, 'utf8', function(err, content){
     if(err){next(err)}
     else{
     var postjson = JSON.parse(content);
@@ -131,6 +131,7 @@ router.get('/:pageId', function(request, response, next){//상세페이지
     var sanitizedDescription = sanitizeHtml(postjson.description, {
       allowedTags:['h1']
     });
+    sanitizedDescription += `<a href="/comment/create"><br><br><br>댓글</a>`
     var controls = `<a href="/topic/create">create</a>`;
     if (isAuthor) {
       controls += `
@@ -138,7 +139,7 @@ router.get('/:pageId', function(request, response, next){//상세페이지
         <form action="/topic/delete_process" method="post" style="display:inline">
           <input type="hidden" name="id" value="${sanitizedTitle}">
           <input type="submit" value="delete">
-        </form>
+        </form> 
       `;
     }
     var list = template.list(request.list);
