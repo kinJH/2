@@ -39,24 +39,26 @@ router.post('/login_process', (req, res)=>{ //로그인진행
 
     db.query(`select * from user where id=?`,[id], (err, result)=>{
         if(err){throw err}
-        console.log(result[0].id)
+
+        if(!result[0]){
+            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+            res.end(`<script> alert('아이디 오류'); location.href='/login';</script>`)
+        }
         
-        if(id ===result[0].id && password === result[0].password){
+        else if(id ===result[0].id && password === result[0].password){
             res.writeHead(302,{location:`/`, 'set-cookie':
                 [`name=${encodeURIComponent(result[0].name)}; Path=/`,
-                'is_logined=logined; Path=/'
+                'is_login=logined; Path=/',
+                `id=${id}; path=/`
                 ]
             })
             res.end()
         }
         else{
-            res.writeHead(302, {location:`/login`})
-            res.end()
-        }
-            
+            res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+            res.end(`<script> alert('로그인 오류'); location.href='/login';</script>`)
+        }   
     })
-
-
 })
 
 module.exports = router

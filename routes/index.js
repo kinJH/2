@@ -10,7 +10,6 @@ router.get('/', function(req,res){//기본페이지
     var title = 'Welcome';
     var description = '';
     var list = template.list(req.list);
-    console.log(res.locals.authStatus)
     
     var html = template.HTML(title, list,
       `<h2>${title}</h2>${description}
