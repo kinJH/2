@@ -8,9 +8,10 @@ var cookie = require('cookie');
 var mysql = require('mysql');
 
 var db = mysql.createConnection({
-    host : 'localhost',
-    user : 'root',
-    password : '',
+    host : 'database-1.ctg002k6i7pc.ap-northeast-2.rds.amazonaws.com',
+    user : 'admin',
+    password : '11111111',
+    port : 3306,
     database : 'board'
 }) 
 
