@@ -6,16 +6,8 @@ var fs = require('fs');
 var template = require('../lib/template.js');
 var cookie = require('cookie');
 var mysql = require('mysql');
+var db = require('./db.js');
 
-
-
-var db = mysql.createConnection({
-    host : 'database-1.ctg002k6i7pc.ap-northeast-2.rds.amazonaws.com',
-    user : 'admin',
-    password : '11111111',
-    port : 3306,
-    database : 'board'
-}) 
 
 
 
@@ -27,7 +19,7 @@ router.get('/', (req, res)=>{//로그인 페이지
   <p><input type='text' name='id' placeholder='id'></p>
   <p><input type='password' name='password' placeholder='password'></p>
   <input type='submit' value='로그인'>
-  </form>`;
+  </form>`; 
   var html = template.HTML(title, list, description,`
   <a href='/signup'>가입</a>`, res.locals.authStatus)
   res.send(html) 
@@ -46,14 +38,12 @@ router.post('/login_process', (req, res)=>{ //로그인진행
             res.end(`<script> alert('아이디 오류'); location.href='/login';</script>`)
         }
         
-        else if(id ===result[0].id && password === result[0].password){
-            res.writeHead(302,{location:`/`, 'set-cookie':
-                [`name=${encodeURIComponent(result[0].name)}; Path=/`,
-                'is_login=logined; Path=/',
-                `id=${id}; path=/`
-                ]
-            })
-            res.end()
+        else if(id ===result[0].id && password === result[0].password){//로그인 성공
+            req.session.is_logined = true;
+            req.session.name = result[0].name;
+            req.session.userId = result[0].id;
+            res.redirect('/')
+                    
         }
         else{
             res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })

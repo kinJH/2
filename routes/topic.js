@@ -6,14 +6,8 @@ var fs = require('fs');
 var template = require('../lib/template.js');
 var cookie = require('cookie');
 var mysql = require('mysql');
+var db = require('./db.js');
 
-var db = mysql.createConnection({
-    host : 'database-1.ctg002k6i7pc.ap-northeast-2.rds.amazonaws.com',
-    user : 'admin',
-    password : '11111111',
-    port : 3306,
-    database : 'board'
-}) 
 
 
 
@@ -35,43 +29,29 @@ router.get('/create', function(req, res){//생성페이지
   res.send(html)
 })
 
-
-
-router.post('/create_process', function(request, response){//생성진행
-  var post = request.body;
-  var title = post.title;
-  var cookies = cookie.parse(request.headers.cookie || '');
-  var author = cookies.name || '';
-  var description = post.description;
-  var postjson = {
-    author : author,
-    title : title,
-    description : description
-  }
-  fs.writeFile(`data/post/${title}.json`, JSON.stringify(postjson), 'utf-8', error=>{
-    response.redirect(`/topic/${title}.json`)
-  })
+router.post('/create_process', (req, res)=>{//생성진행
+  var post = req.body;
+  author = req.session.userId;
+  db.query("INSERT INTO `board`.`post` (`title`, `description`, `author_id`) VALUES (?,?,?);", [post.title, post.description, author??''], (err, result)=>{
+    if(err){res.send('쓰기 오류')}
+    res.redirect(`/topic/${result.insertId}`)})
 })
+
 
 router.get('/update/:pageId', (request, response) =>{//수정페이지
   var filteredId = path.parse(request.params.pageId).base;
-  fs.readFile(`data/post/${filteredId}.json`, 'utf8', function(err, content){
-    
-    var postjson = JSON.parse(content);
-    var cookies = cookie.parse(request.headers.cookie || '');
-    var loginUser = decodeURIComponent(cookies.name || '');
-    var isAuthor = loginUser === postjson.author;
+
+  db.query("select * from post where id=?",[filteredId], (err, result)=>{
+    var isAuthor = res.session.userId === result[0].author_id;
     var list = template.list(request.list)
-    
-    var list = template.list(request.list);
     var html = template.HTML(
-      sanitizeHtml(postjson.title),
+      result[0].title,
       list,
       `
       <form action="/topic/update_process" method="post">
-        <input type="hidden" name="old_title" value="${sanitizeHtml(postjson.title)}">
-        <p><input type="text" name="title" placeholder="title" value="${sanitizeHtml(postjson.title)}"></p>
-        <p><textarea name="description" placeholder="description">${sanitizeHtml(postjson.description)}</textarea></p>
+        <input type="hidden" name="post_id" value="${filteredId}">
+        <p><input type="text" name="title" placeholder="title" value="${result[0].title}"></p>
+        <p><textarea name="description" placeholder="description">${result[0].description}</textarea></p>
         <p><input type="submit" value="수정"></p>
       </form>
       `,
@@ -79,47 +59,21 @@ router.get('/update/:pageId', (request, response) =>{//수정페이지
       response.locals.authStatus
     );
     response.send(html)
-  });
+  })
 })
 
 router.post('/update_process', (request, response) => {//수정 진행
   var post = request.body;
-  var oldTitle = post.old_title;
-  var newTitle = post.title;
-  var oldFilename = `data/post/${oldTitle}.json`;
-  var newFilename = `data/post/${newTitle}.json`;
-
-  var cookies = cookie.parse(request.headers.cookie || '');
-  var loginUser = decodeURIComponent(cookies.name || '');
-
-  fs.readFile(oldFilename, 'utf8', (err, content) => {
-    if (err) {
-      return response.status(500).send('error');
-    }
-    var postjson = JSON.parse(content);
-    
-    if (loginUser !== postjson.author) {
-      return response.send(`
-        <script>
-          alert("작성자 불일치");
-          location.href = "/";
-        </script>
-      `);
-    }
-    postjson.title = newTitle;
-    postjson.description = post.description;
-
-    fs.rename(oldFilename, newFilename, function(err){
-      fs.writeFile(newFilename, JSON.stringify(postjson), 'utf8', err => {
-        if (err) return response.status(500).send('파일 저장 실패');
-        response.redirect(`/topic/${newTitle}.json`);
-      })
-    })
-  });
+  db.query("UPDATE `board`.`post` SET `title`=?, `description`=? WHERE (`id`=?);", [post.title, post.description, post_id],(err, result)=>{
+    response.redirect(`/topic/${insertId}`)
+  })
 });
+
+
 router.post('/delete_process', function(request, response){ //삭제 진행
   var post = request.body;
-  fs.unlink(`data/post/${post.id}.json`, error =>{
+  db.query("DELETE FROM `board`.`post` WHERE (`id`=?);",[post.id], (err, result)=>{
+    if(err){response.send('삭제 오류')}
     response.redirect('/')
   })
 })  
@@ -127,27 +81,33 @@ router.post('/delete_process', function(request, response){ //삭제 진행
 
 router.get('/:pageId', function(request, response, next){//상세페이지
   var filteredId = path.parse(request.params.pageId).base ;
-  fs.readFile(`data/post/${filteredId}`, 'utf8', function(err, content){
+
+
+  db.query("select * from post where id=?", [filteredId], (err, result)=>{
     if(err){next(err)}
     else{
-    var postjson = JSON.parse(content);
-    var sanitizedTitle = sanitizeHtml(postjson.title);
-    var cookies = cookie.parse(request.headers.cookie || '');
-    var loginUser = decodeURIComponent(cookies.name || '');
-    var isAuthor = loginUser === postjson.author;
-    var sanitizedDescription = sanitizeHtml(postjson.description, {
+
+    if (!result || result.length === 0) {
+      
+      return response.status(404).send("해당 게시글이 존재하지 않습니다.");
+    }
+    var sanitizedTitle = sanitizeHtml(result[0].title);
+    var loginUser = decodeURIComponent(request.session.name || '');
+    var isAuthor = request.session.userId??'' === result[0].author_id;
+    var sanitizedDescription = sanitizeHtml(result[0].description, {
       allowedTags:['h1']
     });
-    db.query(`select * from comment where post=?`, [path.parse(filteredId).name], (err, result)=>{
-      sanitizedDescription += `<a href="/comment/create" onclick="document.cookie='postTitle=${encodeURIComponent(sanitizedTitle)}; path=/'"></br></br>댓글<br><br><br></a>`
+    sanitizedDescription += `</a><br><br><br><a href="/comment/${filteredId}">댓글작성</a><br><br><br>`;
+    db.query(`select * from comment where post_id=?`, [filteredId], (err, result)=>{
       var i = 0
-      while(i<result.length){// 댓글
+      result = result ?? '';
+      while(i<result.length){// 본문댓글
         var delete_button = ''
         var edit_button = ''
-        if(cookies.id==result[i].author_id){
+        if(request.session.userId??''==result[i].author_id){
           var delete_button = `
           <form action="/comment/delete" method="post" style="display:inline">
-            <input type="hidden" name="postTitle" value="${result[i].post}">
+            <input type="hidden" name="post_id" value="${filteredId}">
             <input type="hidden" name="id" value="${result[i].id}">
             <input type="submit" value="댓글 삭제">
           </form>
@@ -155,6 +115,7 @@ router.get('/:pageId', function(request, response, next){//상세페이지
           var edit_button = `
           <form action="/comment/update" method="post" style="display:inline">
             <input type="hidden" name="id" value="${result[i].id}">
+            <input type="hidden" name="post_id" value="${filteredId}">
             <input type="submit" value="댓글 수정">
           </form>
           `
@@ -165,9 +126,9 @@ router.get('/:pageId', function(request, response, next){//상세페이지
       var controls = `<a href="/topic/create">create</a>`;
       if (isAuthor) {
         controls += `
-          <a href="/topic/update/${sanitizedTitle}">update</a>
+          <a href="/topic/update/${filteredId}">update</a>
           <form action="/topic/delete_process" method="post" style="display:inline">
-            <input type="hidden" name="id" value="${sanitizedTitle}">
+            <input type="hidden" name="id" value="${filteredId}">
             <input type="submit" value="게시글 삭제">
           </form> 
         `;
@@ -178,7 +139,9 @@ router.get('/:pageId', function(request, response, next){//상세페이지
       response.send(html)
     })
     }
-  });
+  })
+
+
 })
 
 module.exports = router;

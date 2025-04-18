@@ -1,20 +1,9 @@
 const express = require('express')
 var router = express.Router()
 var path = require('path')
-var sanitizeHtml = require('sanitize-html');
-var fs = require('fs');
 var template = require('../lib/template.js');
-var cookie = require('cookie');
-var mysql = require('mysql');
+var db = require('./db.js');
 
-
-var db = mysql.createConnection({
-    host : 'database-1.ctg002k6i7pc.ap-northeast-2.rds.amazonaws.com',
-    user : 'admin',
-    password : '11111111',
-    port : 3306,
-    database : 'board'
-}) 
 
 router.get('/', (req, res)=>{
     var title = 'sign up';
@@ -33,9 +22,21 @@ router.get('/', (req, res)=>{
 
 router.post('/signup_process', (req, res)=>{
     var info = req.body;
+    
     if(info.password===info.password_check){
-        db.query('INSERT INTO user (id, password, name) VALUES (?, ?, ?)', [info.id, info.password, info.name])
-        res.redirect('/')
+        db.query('INSERT INTO user (id, password, name) VALUES (?, ?, ?)', [info.id, info.password, info.name], (err)=>{
+          if(err){
+            res.send(`
+            <script>
+              alert('중복 ID');
+              location.href = '/signup';
+            </script>
+            `)
+          }
+          else{
+            res.redirect('/')
+          }
+        })
     }
     else {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
