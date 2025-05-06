@@ -1,0 +1,26 @@
+<h3>댓글</h3>
+<form method="post" action="/comment/create-process">
+    <textarea name="description" ></textarea>
+    <input type="hidden" name="postId" value="<%= postId %>">
+    <input type="submit" value="제출">
+</form>
+<div id="commentList"></div>
+<script>
+    fetch('/api/comments/<%= postId %>').then(res=>res.json()).then(comments=>{
+        const commentList = document.getElementById('commentList')
+        const userId = "<%= userId %>";
+        let list = '<ul>'
+        for(let i=0;i<comments.length;i++){
+            let comment = comments[i]
+            list +='<li>'
+            list += comment.description;
+            if(comment.author_id===null||comment.author_id===userId){
+                list += `&emsp;<a href="/comment/delete/${comment.id}">삭제</a></li>`
+            }
+        }
+        list +='</ul>'
+        console.log(list)
+        commentList.innerHTML=list;
+    })
+</script>
+    

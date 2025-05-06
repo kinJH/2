@@ -1,0 +1,11 @@
+<form method="post" action="/post/create-process">
+    <h2><input type="text" placeholder="제목" name="title"></h2>
+    <input type="text" placeholder="본문" name="description" style="height: 80px;">
+    <input type="hidden" name="board" id="boardInput">
+    <input type="submit" value="제출">
+</form>
+
+<script>
+    const board = window.location.pathname.split('/')[2];
+    document.getElementById('boardInput').value = board;
+</script>

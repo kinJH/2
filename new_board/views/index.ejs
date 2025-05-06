@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>게시판</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <script src="/js/common.js"></script>
+</head>
+<body>
+        <%#- script%>
+    <header>
+    <h1><a href="/">📋 게시판</a></h1>
+    <%- authStatusUi %>
+    <%- include('nav') %>
+  </header>
+
+
+  <main>
+    <section>
+       <h2><%- boardTitle %></h2>
+       <%- boardBody %><br>
+       <%- underBody %><br><br>
+       <%- include(template1) %>
+       <%- include(template2) %>
+       <%- include(template3) %>
+
+    </section>          
+  </main>
+
+  <aside id="under-body">
+    <br><br><br>
+  </aside>
+</body>
+</html>
