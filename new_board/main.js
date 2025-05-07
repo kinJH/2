@@ -24,7 +24,17 @@ app.use('/board', boardRouter)
 app.use('/post', postRouter)
 app.use('/comment', commentRouter)
 app.use('/api', apiRouter);
+app.use('/test-err',(req, res)=>{
+    throw new Error('에러발생')
+})
 
+app.use((req, res)=>{
+    return res.status(404).send('not found')
+});
+app.use((err, req, res, next)=>{
+    console.log(err)
+    return res.status(500).send('서버 에러')
+})
 
 app.listen(3000,()=>{
     console.log('서버 실행중')

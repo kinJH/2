@@ -31,7 +31,8 @@ router.get('/:post_id', async (req, res)=>{
         boardTitle:post.title,
         boardBody: post.description,
         underBody: controller,
-        template1 : 'comment',
+        template1:'postButtons',
+        template2 : 'comment',
         postId : postId,
         userId : req.session.userId
     })

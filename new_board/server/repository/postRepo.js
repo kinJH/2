@@ -38,5 +38,13 @@ module.exports = {
             })
 
         })
-    }
+    },
+    postUp : (postId)=>{
+        return new Promise((resolve, reject)=>{
+            db.query("UPDATE post SET goods = goods + 1 WHERE id = ?;",[postId],(err, result)=>{
+                if(err){reject(err)}
+                resolve(result)
+            })
+        })
+    },
 }

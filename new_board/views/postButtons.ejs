@@ -1,0 +1,18 @@
+<button onclick="postUp()">추천</button>
+<div id="upCount"></div>
+<button onclick="postDown()">비추천</button>
+<div id="downCount"></div>
+
+<script>
+    const upCounts = document.getElementById("upCount")
+    const downCounts = document.getElementById("downCount")
+    const postUp = ()=>{
+        fetch('/api/post-up',{
+            method:"post",
+            headers: {'Content-Type': 'application/json'},
+            body:JSON.stringify({postId:'<%=postId%>'})}).then(res=>res.json()).then(result=>{
+                upCounts.innerHTML=`추천 : ${result.goods}`
+            }).catch(err=>{console.log(err)})
+    }
+    const postDown = ()=>{alert('<%=postId%> 비추천')}
+</script>

@@ -6,20 +6,34 @@
 </form>
 <div id="commentList"></div>
 <script>
+    const deleteComment = (commentId)=>{
+        fetch('/comment/delete-comment',{
+            method:'delete',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body:JSON.stringify({'commentId':commentId})}).then(res=>res.json()).then(success=>{
+            if(success){
+                const comment = document.getElementById(`comment-${commentId}`);
+                comment.remove()
+            }
+        })
+    }
+
     fetch('/api/comments/<%= postId %>').then(res=>res.json()).then(comments=>{
         const commentList = document.getElementById('commentList')
         const userId = "<%= userId %>";
         let list = '<ul>'
         for(let i=0;i<comments.length;i++){
             let comment = comments[i]
-            list +='<li>'
+            list +=`<li id='comment-${comment.id}'>`
             list += comment.description;
             if(comment.author_id===null||comment.author_id===userId){
-                list += `&emsp;<a href="/comment/delete/${comment.id}">삭제</a></li>`
+                list += `&emsp;<button onclick="deleteComment(${comment.id})">삭제</button></li>`
             }
+
         }
         list +='</ul>'
-        console.log(list)
         commentList.innerHTML=list;
     })
 </script>

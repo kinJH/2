@@ -22,5 +22,8 @@ module.exports = {
     },
     update : async (id, title, description)=>{
         await postRepo.updatePost(id, title, description)
+    },
+    postUp : async (postId) => {
+        return await postRepo.postUp(postId);
     }
 }

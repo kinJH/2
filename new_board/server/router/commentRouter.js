@@ -8,11 +8,11 @@ router.post('/create-process', (req,res)=>{
     commentLogic.createComment(req.session.userId??null,comment.description,comment.postId)
     res.redirect(`/post/${comment.postId}`)
 })
-router.get('/delete/:comment_id',async (req, res)=>{
-    const commentId = req.params.comment_id;
+
+router.delete('/delete-comment',async (req, res)=>{
+    const commentId = req.body.commentId;
     commentLogic.deleteComment(commentId, req.session.userId);
-    const postId = await commentLogic.getPostIdByCommentId(commentId);
-    res.redirect(`/post/${postId}`)
+    return res.json({success : true})
 })
 
     
