@@ -32,6 +32,8 @@ router.get('/:post_id', async (req, res)=>{
         boardBody: post.description,
         underBody: controller,
         template1:'postButtons',
+        upCounts:'추천 : '+post.goods,
+        downCounts:'비추천 : '+post.bads,
         template2 : 'comment',
         postId : postId,
         userId : req.session.userId

@@ -1,7 +1,7 @@
 <button onclick="postUp()">추천</button>
-<div id="upCount"></div>
+<div id="upCount"><%=upCounts%></div>
 <button onclick="postDown()">비추천</button>
-<div id="downCount"></div>
+<div id="downCount"><%=downCounts%></div>
 
 <script>
     const upCounts = document.getElementById("upCount")
@@ -11,8 +11,22 @@
             method:"post",
             headers: {'Content-Type': 'application/json'},
             body:JSON.stringify({postId:'<%=postId%>'})}).then(res=>res.json()).then(result=>{
-                upCounts.innerHTML=`추천 : ${result.goods}`
+            upCounts.innerHTML=`추천 : ${result.goods}`
+            console.log('seccuss')
+            }).catch(err=>{
+                console.log(err)
+                if(err.Error==='liked'){
+                    alert('중복 추천');
+                    history(0);
+                }
+            })
+    }
+    const postDown = ()=>{
+        fetch('/api/post-down',{
+            method:"post",
+            headers: {'Content-Type': 'application/json'},
+            body:JSON.stringify({postId:'<%=postId%>'})}).then(res=>res.json()).then(result=>{
+                downCounts.innerHTML=`비추천 : ${result.bads}`
             }).catch(err=>{console.log(err)})
     }
-    const postDown = ()=>{alert('<%=postId%> 비추천')}
 </script>

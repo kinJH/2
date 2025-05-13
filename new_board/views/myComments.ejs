@@ -1,0 +1,13 @@
+<table>
+    <tr>
+        <th>내가 쓴 댓글</th>
+        <th>본문</th>
+
+    </tr>
+    <% myComments.forEach((comment)=>{ %>
+        <tr>
+            <td><%=comment.description%></td>
+            <td><a href="/post/<%=comment.post_id%>"><%=comment.post_title %></a></td>
+        </tr>
+    <%} ) %> 
+</table>

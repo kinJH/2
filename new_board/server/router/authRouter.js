@@ -16,8 +16,12 @@ router.post('/login-process', (req, res)=>{
 })
 
 router.get('/logout', (req, res)=>{  
-    authLogic.logout(req, res)
-})
+        req.session.destroy(err=>{
+            if(err){throw err}
+            else{
+                res.redirect('/')
+            }
+        })})
 
 router.get('/signup', (req, res)=>{
     res.render('index',{
@@ -28,9 +32,15 @@ router.get('/signup', (req, res)=>{
     })
 })
 
-router.post('/signup-process', (req, res)=>{
-    authLogic.signup(req, res)
+router.post('/signup-process', async (req, res)=>{
+    try{    
+        await authLogic.signup(req.body)
+        res.redirect('/')
+    } catch(err){
+        res.send(`<script>alert('${err.message}');location='/auth/signup'</script>`)
+    }
 })
+
 
 
 

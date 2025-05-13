@@ -24,5 +24,9 @@ module.exports = {
         else{
             return new Error('권한 없음')
         }
+    },
+    myComments : async (userId)=>{
+        const comments = await commentRepo.getCommentsByauthor(userId)
+        return comments
     }
 }

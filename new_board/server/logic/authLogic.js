@@ -12,24 +12,19 @@ module.exports = {
         req.session.name = user.name;
         res.redirect('/')
     },
-    logout : (req, res)=>{
-        req.session.destroy(err=>{
-            if(err){throw err}
-            else{
-                res.redirect('/')
-            }
-            
-        })
-    },
-    signup : async (req, res)=>{
-        const {id, password, passwordCheck, name} = req.body;
+    signup : async ({id, password, passwordCheck, name})=>{
         if(await authRepo.getUserById(id)){
-            return res.send('id 중복')
+            throw new Error('ID 중복')
         }
         else{
             await authRepo.signup(id, password, name)
-            res.redirect('/')
         }
-
+    },
+    deleteAccount : async (userId, password)=>{
+        const userInfo = await authRepo.getUserById(userId);
+        if(userInfo.password===password){
+            authRepo.deleteAccount(userId)
+        }
+        else{throw new Error('비밀번호 불일치')}
     }
 }

@@ -46,5 +46,21 @@ module.exports = {
                 resolve(result)
             })
         })
+    },    
+    postDown : (postId)=>{
+        return new Promise((resolve, reject)=>{
+            db.query("UPDATE post SET bads = bads + 1 WHERE id = ?;",[postId],(err, result)=>{
+                if(err){reject(err)}
+                resolve(result)
+            })
+        })
     },
+    getPostsByUser : (userId)=>{
+        return new Promise((resolve, reject)=>{
+            db.query("select * from post where author_id=?",[userId],(err, result)=>{
+                if(err){throw reject(err)}
+                return resolve(result)
+            })
+        })
+    }
 }

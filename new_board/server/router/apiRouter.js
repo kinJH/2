@@ -2,8 +2,10 @@ const express = require('express');
 const commentLogic = require('../logic/commentLogic');
 const postLogic = require('../logic/postLogic');
 const postRepo = require('../repository/postRepo');
-
+const cookieParser = require('cookie-parser');
 const router = express.Router();
+
+router.use(cookieParser());
 
 router.get('/comments/:post_id', async (req, res)=>{
     const postId = req.params.post_id
@@ -14,13 +16,26 @@ router.get('/comments/:post_id', async (req, res)=>{
 router.post('/post-up', async (req, res)=>{
     try{
         const postId = req.body.postId;
-        await postLogic.postUp(postId);
+        await postLogic.postUp(postId, req.cookies);
+        res.cookie(`liked-${postId}`,true)
         const post = await postRepo.getPostById(postId)
-        res.json({goods:post.goods})
-    
+        res.json({goods:post.goods}) 
     } catch(err){
-        throw(err)
-    }    
+        if(err.message==='liked'){
+            throw new Error('liked')
+        }
+        else{res.status(500).json({error:'추천 중 서버 오류'})}
+    }
+})  
+
+router.post('/post-down', async (req, res)=>{
+    try{
+        const postId = req.body.postId;
+        await postLogic.postDown(postId);
+        const post = await postRepo.getPostById(postId)
+        res.json({bads:post.bads})
+    
+    } catch(err){throw(err)}
 })
 
     

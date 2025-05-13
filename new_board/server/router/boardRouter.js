@@ -16,12 +16,13 @@ router.get('/:board_name/create', (req, res)=>{
 
 router.get('/:board_name', async (req, res)=>{
     const board = req.params.board_name;
+    const writeButton = await boardLogic.writeButton(board, req.session.userId)
     
     res.render('index',{
         boardTitle:board,
         boardBody: await boardLogic.makeList(board),
-        underBody:`<a href="/board/${board}/create">글쓰기</a>`
-    })  
+        underBody:writeButton
+    })
 })
 
 

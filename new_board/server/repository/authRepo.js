@@ -14,5 +14,13 @@ module.exports = {
             if(err){throw err}
             return result
         })
+    },
+    deleteAccount : (id)=>{
+        return new Promise((resolve, reject)=>{
+            db.query("DELETE FROM `board`.`user` WHERE (`id`=?);",[id],(err, result)=>{
+                if(err){reject(err)}
+                return resolve(result)
+            })      
+        })
     }
 }

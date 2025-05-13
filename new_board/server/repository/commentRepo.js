@@ -25,5 +25,23 @@ module.exports = {
         db.query("DELETE FROM `board`.`comment` WHERE (`id`=?);",[commentId],(err, result)=>{
             if(err){throw err}
         })
+    },
+    getCommentsByauthor : (userId)=>{
+        return new Promise((resolve, reject)=>{
+            db.query("select comment.id as comment_id, comment.post_id as post_id, comment.description, post.description as post_description, comment.author_id, post.title as post_title, comment.created from comment, post where comment.author_id=? and post_id = post.id;",
+                [userId],(err, result)=>{
+                if(err){throw reject(err)}
+                return resolve(result)
+            })
+        })
+    },
+    getCommentsByPostid : (postId)=>{
+        return new Promise((resolve, reject)=>{
+            db.query("select * from comment where post_id=?",[postId],(err, result)=>{
+                if(err){throw reject(err)}
+                return resolve(result)
+            })
+        })
     }
+
 }

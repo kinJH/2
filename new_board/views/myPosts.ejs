@@ -1,0 +1,16 @@
+<table>
+    <tr>
+        <th>제목</th>
+        <th>추천</th>
+        <th>비추천</th>
+        <th>댓글 수</th>
+    </tr>
+    <% myPosts.forEach((post)=>{ %>
+        <tr id="mypost-<%= post.id %>">
+            <td><a href="/post/<%= post.id %>"><%= post.title %></a></td>
+            <td><%= post.goods %></td>
+            <td><%= post.bads %> </td>
+            <td><%= post.commentNum %></td>
+        </tr> 
+    <%} ) %>
+</table>
