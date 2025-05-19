@@ -62,5 +62,13 @@ module.exports = {
                 return resolve(result)
             })
         })
+    },
+    clearUserPost : (userId)=>{
+        return new Promise((resolve, reject)=>{
+            db.query("delete from post where author_id=?",[userId],(err, result)=>{
+                if(err){return reject(err)}
+                return resolve(result)
+            })
+        })
     }
 }

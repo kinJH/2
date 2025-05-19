@@ -42,6 +42,21 @@ module.exports = {
                 return resolve(result)
             })
         })
+    },
+    clearUserComment : (userId)=>{
+        return new Promise((resolve, reject)=>{
+            db.query("delete from comment where author_id=?",[userId],(err, result)=>{
+                if(err){return reject(err)}
+                return resolve(result)
+            })
+        })
+    },
+    deletePostcomment : (postId)=>{
+        return new Promise((resolve, reject)=>{
+            db.query("delete from comment where post_id=?",[postId],(err, result)=>{
+                if(err){return reject(err)}
+                return resolve(result)
+            })
+        })    
     }
-
 }

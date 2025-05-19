@@ -1,0 +1,11 @@
+<% if(!(board=="notice" && role!=='admin')){%>
+    <a class="button" id="writeButton" href="/board/<%=board%>/create">글쓰기✏️</a>
+<%}%>
+
+<ul>
+    <% for(let i=0; i < posts.length; i++){ %>
+        <% let post=posts[i] %>
+        <li id="post<%= post.id%>"><a href="/post/<%= post.id%>"><%= post.title%></a></li>
+    <%}%>
+</ul>
+

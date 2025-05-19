@@ -36,6 +36,9 @@ router.post('/deleting-account',async (req, res)=>{
     const{password} = req.body;
     try {
         await authLogic.deleteAccount(req.session.userId,password)
+        req.session.destroy(err=>{
+            throw err
+        })
         res.send('<script>alert("탈톼완료"); location="/"</script>')
     } catch (error) {
         console.log(error.message)

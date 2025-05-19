@@ -6,27 +6,44 @@
 <script>
     const upCounts = document.getElementById("upCount")
     const downCounts = document.getElementById("downCount")
-    const postUp = ()=>{
-        fetch('/api/post-up',{
-            method:"post",
-            headers: {'Content-Type': 'application/json'},
-            body:JSON.stringify({postId:'<%=postId%>'})}).then(res=>res.json()).then(result=>{
-            upCounts.innerHTML=`추천 : ${result.goods}`
-            console.log('seccuss')
-            }).catch(err=>{
-                console.log(err)
-                if(err.Error==='liked'){
-                    alert('중복 추천');
-                    history(0);
-                }
+    const postUp = async()=>{
+        try {
+            const res = await fetch('/api/post-up',{
+                method:'post',
+                headers:{'Content-type':'application/json'},
+                body:JSON.stringify({postId:'<%=postId%>'})
             })
-    }
-    const postDown = ()=>{
-        fetch('/api/post-down',{
-            method:"post",
-            headers: {'Content-Type': 'application/json'},
-            body:JSON.stringify({postId:'<%=postId%>'})}).then(res=>res.json()).then(result=>{
-                downCounts.innerHTML=`비추천 : ${result.bads}`
-            }).catch(err=>{console.log(err)})
+            if(!res.ok){
+                const err = await res.json()
+                throw(err)
+            }
+            const result = await res.json()
+            console.log(result)
+            upCounts.innerHTML = `추천 : ${result.goods}`;
+
+            
+        } catch (error) {
+            alert(error.error)
+        }
+    }   
+    const postDown = async ()=>{
+        try {
+            const res = await fetch('/api/post-down',{
+                method:'post',
+                headers:{'Content-type':'application/json'},
+                body:JSON.stringify({postId:'<%=postId%>'})
+            })
+            if(!res.ok){
+                const err = await res.json()
+                throw(err)
+            }
+            const result = await res.json()
+            console.log(result)
+            downCounts.innerHTML = `비추천 : ${result.bads}`;
+
+            
+        } catch (error) {
+            alert(error.error)
+        }    
     }
 </script>

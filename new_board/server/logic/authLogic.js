@@ -1,29 +1,34 @@
 const authRepo = require("../repository/authRepo");
+const commentRepo = require("../repository/commentRepo");
+const postRepo = require("../repository/postRepo");
 
 
 module.exports = {
-    login : async (req, res)=>{
-        const{id, password} = req.body;
+    login : async (id, password)=>{
         const user = await authRepo.getUserById(id);
-        if(!user){return res.status(400).send('아이디 없음')}
-        if(password!==user.password){return res.status(400).send('비밀번호 오류')}
-        req.session.isLoggedIn = true;
-        req.session.userId = user.id;
-        req.session.name = user.name;
-        res.redirect('/')
+        if(!user){throw new Error('ID 없음')}
+        if(password !==user.password){throw new Error('비밀번호 오류')}
+
     },
     signup : async ({id, password, passwordCheck, name})=>{
+
         if(await authRepo.getUserById(id)){
             throw new Error('ID 중복')
         }
-        else{
-            await authRepo.signup(id, password, name)
+        if(password!==passwordCheck){
+            throw new Error('비밀번호 불일치')
         }
+        authRepo.signup(id, password, name)
+            
+
     },
     deleteAccount : async (userId, password)=>{
+
         const userInfo = await authRepo.getUserById(userId);
         if(userInfo.password===password){
-            authRepo.deleteAccount(userId)
+            await postRepo.clearUserPost(userId);
+            await commentRepo.clearUserComment(userId);
+            await authRepo.deleteAccount(userId);
         }
         else{throw new Error('비밀번호 불일치')}
     }

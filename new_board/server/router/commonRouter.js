@@ -10,8 +10,8 @@ router.get('*', (req, res, next)=>{
     res.locals.boardBody=''
     res.locals.underBody=''
     res.locals.authStatusUi = req.session.isLoggedIn 
-    ? `${req.session.name}님 <a href="/auth/logout">로그아웃</a> <a href="/mypage">마이페이지</a>` 
-    :`<a href="/auth/login">로그인</a> <a href="/auth/signup">회원가입</a>`;
+    ? `${req.session.name}님 <div id="authStatus"><a href="/auth/logout">로그아웃</a> <a href="/mypage">마이페이지</a></div>` 
+    :`<div id="authStatus"><a href="/auth/login">로그인</a> <a href="/auth/signup">회원가입</a></div>`;
     next()
 })
 

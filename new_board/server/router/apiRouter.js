@@ -22,7 +22,7 @@ router.post('/post-up', async (req, res)=>{
         res.json({goods:post.goods}) 
     } catch(err){
         if(err.message==='liked'){
-            throw new Error('liked')
+            return res.status(400).json({error:'중복추천'})
         }
         else{res.status(500).json({error:'추천 중 서버 오류'})}
     }
@@ -31,11 +31,17 @@ router.post('/post-up', async (req, res)=>{
 router.post('/post-down', async (req, res)=>{
     try{
         const postId = req.body.postId;
-        await postLogic.postDown(postId);
+        await postLogic.postDown(postId, req.cookies);
+        res.cookie(`disliked-${postId}`,true)
         const post = await postRepo.getPostById(postId)
-        res.json({bads:post.bads})
-    
-    } catch(err){throw(err)}
+        res.json({bads:post.bads}) 
+    } catch(err){
+        console.log(err)
+        if(err.message==='disliked'){
+            return res.status(400).json({error:'중복추천'})
+        }
+        else{res.status(500).json({error:'추천 중 서버 오류'})}
+    }
 })
 
     

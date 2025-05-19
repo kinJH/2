@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const authLogic = require('../logic/authLogic')
+const authLogic = require('../logic/authLogic');
+const authRepo = require('../repository/authRepo');
 
 router.get('/login', (req, res)=>{
     res.render('index',{
@@ -11,17 +12,30 @@ router.get('/login', (req, res)=>{
     })  
 })
 
-router.post('/login-process', (req, res)=>{
-    authLogic.login(req, res)
+
+router.post('/login-process', async (req, res, next)=>{
+    const {id, password}=req.body;
+    try {
+        await authLogic.login(id, password);
+        const user = await authRepo.getUserById(id)
+        req.session.isLoggedIn = true;
+        req.session.userId=user.id;
+        req.session.name=user.name;
+        res.status(200).redirect('/')
+
+    } catch (error) {
+        next(error)
+    }
 })
 
 router.get('/logout', (req, res)=>{  
-        req.session.destroy(err=>{
-            if(err){throw err}
-            else{
-                res.redirect('/')
-            }
-        })})
+    req.session.destroy(err=>{
+        if(err){throw err}
+        else{
+            res.redirect('/')
+        }
+    })
+})
 
 router.get('/signup', (req, res)=>{
     res.render('index',{

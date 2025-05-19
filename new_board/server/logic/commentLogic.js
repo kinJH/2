@@ -28,5 +28,6 @@ module.exports = {
     myComments : async (userId)=>{
         const comments = await commentRepo.getCommentsByauthor(userId)
         return comments
-    }
+    },
+
 }

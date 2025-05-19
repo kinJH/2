@@ -12,6 +12,7 @@ module.exports = {
         const author = post.author_id;
         if(module.exports.isAuthor(userId, author)){
             await postRepo.deleteById(postId)
+            await commentRepo.deletePostcomment(postId)
         }
         else{throw new Error('삭제 권한 없음')}
     },
@@ -31,8 +32,12 @@ module.exports = {
         }
         else {return await postRepo.postUp(postId);}
     },
-    postDown : async (postId) => {
-        return await postRepo.postDown(postId);
+    postDown : async (postId, cookies) => {
+        const disliked = cookies[`disliked-${postId}`]
+        if(disliked){
+            throw new Error('disliked')
+        }
+        else {return await postRepo.postDown(postId);}
     },
     myPostsInfo :  (userId)=>{
         return new Promise(async (resove, reject)=>{
@@ -50,5 +55,9 @@ module.exports = {
             const comments = await commentRepo.getCommentsByPostid(postId)
             resolve(comments)
         })
+    },
+    getPostByBoard : async (board)=>{
+        const posts = await postRepo.boardPosts(board);
+        return posts;
     }
 }
